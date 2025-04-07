@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/', [ImageController::class, 'index'])->name('images.index');
+Route::get('/', [ProductController::class, 'index'])->name('products.index');
+Route::get('products/{id}', [ProductController::class, 'show'])->name('products.show');
+//Route::get('/', [ImageController::class, 'index'])->name('images.index');
 
 require __DIR__.'/auth.php';
