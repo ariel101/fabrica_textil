@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -29,5 +30,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/', [ProductController::class, 'index'])->name('products.index');
 Route::get('products/{id}', [ProductController::class, 'show'])->name('products.show');
 //Route::get('/', [ImageController::class, 'index'])->name('images.index');
+
+Route::resource('categories', CategoryController::class);
 
 require __DIR__.'/auth.php';
