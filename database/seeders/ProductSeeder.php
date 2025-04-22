@@ -14,7 +14,7 @@ class ProductSeeder extends Seeder
     public function run(): void
     {
         Product::factory()->count(20)->create([
-            'category_id' => null, // Asegúrate de que la categoría sea nula
+            //'category_id' => null, // Asegúrate de que la categoría sea nula
         ]);
     }
 }

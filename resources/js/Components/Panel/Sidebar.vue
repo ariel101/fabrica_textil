@@ -23,7 +23,7 @@
                 <i class="fas fa-box mr-2"></i>Pedidos
             </InertiaLink>
 
-            <InertiaLink href="#" :class="linkClass('/productos')">
+            <InertiaLink :href="route('products.index')" :class="linkClass('/products')">
                 <i class="fas fa-shopping-cart mr-2"></i>Productos
             </InertiaLink>
 

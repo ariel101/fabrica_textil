@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Product;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,8 @@ class ImageSeeder extends Seeder
             $filename = $file->getFilename();
 
             DB::table('images')->insert([
-                'url' => 'storage/images/' . $filename,
+                'path' => 'storage/images/' . $filename,
+                'product_id' => Product::inRandomOrder()->first()->id, // Asigna un producto aleatorio
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
