@@ -15,7 +15,16 @@ class Product extends Model
         'description',
         'price',
         'stock',
-        'category_id',
-        'image_path',
+        'category_id'
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(Image::class);
+    }
 }
