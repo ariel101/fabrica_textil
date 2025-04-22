@@ -39,7 +39,9 @@ function handleImageError() {
         class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 py-4 bg-white shadow dark:bg-gray-900">
         <!-- Logo -->
         <div class="flex items-center space-x-4">
-            <img src="/images/logo2.jpeg" alt="Logo" class="h-16 w-auto" />
+            <a href="/">
+                <img src="/images/logo.jpg" alt="Logo" class="h-16 w-auto" />
+            </a>
         </div>
 
 

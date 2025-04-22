@@ -4,8 +4,20 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10 bg-white rounded-2xl shadow-lg overflow-hidden">
                 <!-- Imagen del producto -->
                 <div class="flex items-center justify-center bg-gray-100">
-                    <img :src="'/' + product.image_path" alt="Producto"
-                         class="object-contain h-[400px] w-full p-4 transition-transform duration-300 hover:scale-105" />
+                    <button @click="prevImage"
+                        class="absolute left-4 bg-white p-2 rounded-full shadow hover:bg-gray-200"
+                        :disabled="currentImageIndex === 0">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+
+                    <img :src="`/${product.images[currentImageIndex]?.path}`" alt="Imagen del producto"
+                        class="object-cover w-full h-72 transition-all duration-300 ease-in-out" />
+
+                    <button @click="nextImage"
+                        class="absolute right-4 bg-white p-2 rounded-full shadow hover:bg-gray-200"
+                        :disabled="currentImageIndex === product.images.length - 1">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
                 </div>
 
                 <!-- Detalles del producto -->
@@ -32,6 +44,20 @@
 import { usePage } from '@inertiajs/vue3'
 import Welcome from '@/Pages/Welcome.vue'
 import '@fortawesome/fontawesome-free/css/all.min.css'
+import { ref } from 'vue'
 
+const currentImageIndex = ref(0)
+
+const nextImage = () => {
+    if (currentImageIndex.value < product.images.length - 1) {
+        currentImageIndex.value++
+    }
+}
+
+const prevImage = () => {
+    if (currentImageIndex.value > 0) {
+        currentImageIndex.value--
+    }
+}
 const { product } = usePage().props
 </script>

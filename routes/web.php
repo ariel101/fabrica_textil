@@ -25,12 +25,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::resource('categories', CategoryController::class);
+    Route::resource('products', ProductController::class);
 });
 
-Route::get('/', [ProductController::class, 'index'])->name('products.index');
-Route::get('products/{id}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/', [ProductController::class, 'indexHome'])->name('products.indexHome');
+Route::get('product/{id}', [ProductController::class, 'showHome'])->name('products.showHome');
 //Route::get('/', [ImageController::class, 'index'])->name('images.index');
 
-Route::resource('categories', CategoryController::class);
 
 require __DIR__.'/auth.php';
