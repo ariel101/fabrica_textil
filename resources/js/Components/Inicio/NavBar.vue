@@ -1,13 +1,41 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
-import { defineProps } from 'vue';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import { defineProps, ref } from 'vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
+import emitter from '@/utils/eventBus';
 
+// Props
 defineProps({
-    canLogin: Boolean,
-    canRegister: Boolean,
-    auth: Object,
+    canLogin: {
+        type: Boolean,
+    },
+    canRegister: {
+        type: Boolean,
+    },
+    auth: {
+        type: Object,
+    },
+    laravelVersion: {
+        type: String,
+        required: false,
+    },
+    phpVersion: {
+        type: String,
+        required: false,
+    },
+    cartCount: {
+        type: Number,
+        default: 0,
+    },
+});
+
+// Estado local del carrito
+const localCartCount = ref(0);
+
+// Escuchar el evento `update-cart` y actualizar el contador
+emitter.on('update-cart', (newCount) => {
+    localCartCount.value = newCount;
 });
 </script>
 
@@ -31,12 +59,16 @@ defineProps({
         <!-- Carrito + Auth Links -->
         <div class="flex items-center space-x-4">
             <!-- Carrito -->
-            <button class="relative">
+            <a class="relative" :href="route('cart.index')">
                 <svg class="w-6 h-6 text-black dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h13.4M7 13L5.4 5M16 21a1 1 0 11-2 0 1 1 0 012 0zm-8 0a1 1 0 11-2 0 1 1 0 012 0z" />
                 </svg>
-            </button>
+                <span v-if="localCartCount || cartCount"
+                    class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                    {{ localCartCount || cartCount }}
+                </span>
+            </a>
 
             <!-- Auth Links -->
             <div v-if="!canLogin" class="flex items-center space-x-2">
@@ -69,12 +101,12 @@ defineProps({
                 <template v-else>
                     <!-- Si no está logeado -->
                     <Link :href="route('login')" class="text-sm font-medium hover:text-[#FF2D20]">
-                    Iniciar sesión
+                        Iniciar sesión
                     </Link>
 
                     <Link v-if="!canRegister" :href="route('register')"
                         class="text-sm font-medium hover:text-[#FF2D20]">
-                    Registrarse
+                        Registrarse
                     </Link>
                 </template>
             </div>
