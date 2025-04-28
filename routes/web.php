@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProductController;
@@ -27,11 +28,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
+    
 });
 
 Route::get('/', [ProductController::class, 'indexHome'])->name('products.indexHome');
 Route::get('product/{id}', [ProductController::class, 'showHome'])->name('products.showHome');
 //Route::get('/', [ImageController::class, 'index'])->name('images.index');
+
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
 
 
 require __DIR__.'/auth.php';
