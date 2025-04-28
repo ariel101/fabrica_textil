@@ -27,4 +27,11 @@ class Product extends Model
     {
         return $this->hasMany(Image::class);
     }
+
+    public function carts()
+    {
+        return $this->belongsToMany(Cart::class, 'cart_items')
+            ->withPivot('quantity', 'unit_price')
+            ->withTimestamps();
+    }
 }

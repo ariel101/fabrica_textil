@@ -30,7 +30,7 @@
                         <p class="text-blue-600 text-lg mt-2">Disponibles: {{ product.stock }}</p>
                     </div>
 
-                    <button
+                    <button @click="addToCart(product.id)"
                         class="mt-8 w-full md:w-auto px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition duration-300 ease-in-out shadow-md">
                         <i class="fa-solid fa-cart-shopping mr-2"></i> Añadir al carrito
                     </button>
@@ -44,8 +44,11 @@
 import { usePage } from '@inertiajs/vue3'
 import Welcome from '@/Pages/Welcome.vue'
 import '@fortawesome/fontawesome-free/css/all.min.css'
-import { ref } from 'vue'
+import { ref, defineEmits } from 'vue'
+import axios from 'axios'
+import emitter from '@/utils/eventBus.js'
 
+const cartCount = ref(0) // Estado local del carrito
 const currentImageIndex = ref(0)
 
 const nextImage = () => {
@@ -60,4 +63,24 @@ const prevImage = () => {
     }
 }
 const { product } = usePage().props
+
+const addToCart = async (productId) => {
+    try {
+        console.log("Enviando al controlador:", { product_id: productId }); // 🔍 Ver datos antes de enviar
+
+        const response = await axios.post('/cart/add', {
+            product_id: productId
+        });
+
+        cartCount.value += 1; // Incrementar el contador del carrito
+        // Emitimos el evento para que Navbar lo reciba
+        emitter.emit('update-cart', cartCount.value);
+
+        console.log("Respuesta del servidor:", response.data);
+    } catch (error) {
+        console.error("Error al agregar al carrito:", error);
+    }
+};
+
+
 </script>
