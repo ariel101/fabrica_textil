@@ -1,5 +1,7 @@
 <template>
     <div class="flex h-screen">
+        <!-- <h1>USUARIO = {{ $page.props.auth.user.name }}</h1> -->
+
         <!-- Sidebar -->
         <Sidebar />
         <div class="flex-1 flex flex-col overflow-hidden">
@@ -31,6 +33,9 @@ export default {
     },
 
 }
+
+//const isClient = $page.props.auth.user.hasRole('client');
+
 </script>
 
 <style scoped>

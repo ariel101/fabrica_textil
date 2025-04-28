@@ -32,20 +32,36 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'cellphone' => 'nullable|string|max:20',
+            'identity_card' => 'nullable|string|max:20',
+            'city' => 'nullable|string|max:100',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'cellphone' => $request->cellphone,
+            'identity_card' => $request->identity_card,
+            'city' => $request->city,
         ]);
+
+        // Asignar automáticamente el rol "client" al nuevo usuario
+        $user->assignRole('client');
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        // Redirigir basado en el rol
+        if ($user->hasRole('admin')) {
+            return redirect(route('dashboard', absolute: false));
+        } else {
+            return redirect()->intended('/');
+        }
+
+        //return redirect(route('dashboard', absolute: false));
     }
 }

@@ -11,6 +11,9 @@ const form = useForm({
     email: '',
     password: '',
     password_confirmation: '',
+    cellphone: '',
+    identity_card: '',
+    city: '',
 });
 
 const submit = () => {
@@ -22,9 +25,12 @@ const submit = () => {
 
 <template>
     <GuestLayout>
+
         <Head title="Register" />
 
         <form @submit.prevent="submit">
+
+            <!-- Name -->
             <div>
                 <InputLabel for="name" value="Name" />
 
@@ -32,15 +38,13 @@ const submit = () => {
                     id="name"
                     type="text"
                     class="mt-1 block w-full"
-                    v-model="form.name"
-                    required
-                    autofocus
+                    v-model="form.name" required autofocus
                     autocomplete="name"
                 />
-
                 <InputError class="mt-2" :message="form.errors.name" />
             </div>
 
+            <!-- Email -->
             <div class="mt-4">
                 <InputLabel for="email" value="Email" />
 
@@ -52,10 +56,50 @@ const submit = () => {
                     required
                     autocomplete="username"
                 />
-
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
+            <!-- Cellphone -->
+            <div class="mt-4">
+                <InputLabel for="cellphone" value="Cellphone" />
+
+                <TextInput
+                    id="cellphone"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.cellphone"
+                    autocomplete="tel"
+                />
+                <InputError class="mt-2" :message="form.errors.cellphone" />
+            </div>
+
+            <!-- Identity Card -->
+            <div class="mt-4">
+                <InputLabel for="identity_card" value="Identity Card" />
+
+                <TextInput
+                    id="identity_card"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.identity_card"
+                />
+                <InputError class="mt-2" :message="form.errors.identity_card" />
+            </div>
+
+            <!-- City -->
+            <div class="mt-4">
+                <InputLabel for="city" value="City" />
+
+                <TextInput
+                    id="city"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.city"
+                />
+                <InputError class="mt-2" :message="form.errors.city" />
+            </div>
+
+            <!-- Password -->
             <div class="mt-4">
                 <InputLabel for="password" value="Password" />
 
@@ -67,15 +111,12 @@ const submit = () => {
                     required
                     autocomplete="new-password"
                 />
-
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
+            <!-- Confirm Password -->
             <div class="mt-4">
-                <InputLabel
-                    for="password_confirmation"
-                    value="Confirm Password"
-                />
+                <InputLabel for="password_confirmation" value="Confirm Password" />
 
                 <TextInput
                     id="password_confirmation"
@@ -85,27 +126,18 @@ const submit = () => {
                     required
                     autocomplete="new-password"
                 />
-
-                <InputError
-                    class="mt-2"
-                    :message="form.errors.password_confirmation"
-                />
+                <InputError class="mt-2" :message="form.errors.password_confirmation" />
             </div>
 
+            <!-- Buttons -->
             <div class="mt-4 flex items-center justify-end">
-                <Link
-                    :href="route('login')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                    Already registered?
+                <Link :href="route('login')"
+                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                Ya esta Registrado?
                 </Link>
 
-                <PrimaryButton
-                    class="ms-4"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
-                    Register
+                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                    Registrarse
                 </PrimaryButton>
             </div>
         </form>
