@@ -18,19 +18,11 @@
     </div>
 </template>
 
-<script>
+<script setup>
 import Sidebar from '@/Components/Panel/Sidebar.vue';
 import NavBar from '@/Components/Panel/NavBar.vue';
 import StatisticGrid from '@/Components/Panel/StatisticGrid.vue';
 
-export default {
-    components: {
-        Sidebar,
-        NavBar,
-        StatisticGrid
-    },
-
-}
 </script>
 
 <style scoped>
