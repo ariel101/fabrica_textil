@@ -1,5 +1,7 @@
 <template>
     <div class="flex h-screen">
+        <!-- <h1>USUARIO = {{ $page.props.auth.user.name }}</h1> -->
+
         <!-- Sidebar -->
         <Sidebar />
         <div class="flex-1 flex flex-col overflow-hidden">
@@ -18,10 +20,21 @@
     </div>
 </template>
 
-<script setup>
+<script>
 import Sidebar from '@/Components/Panel/Sidebar.vue';
 import NavBar from '@/Components/Panel/NavBar.vue';
 import StatisticGrid from '@/Components/Panel/StatisticGrid.vue';
+
+export default {
+    components: {
+        Sidebar,
+        NavBar,
+        StatisticGrid
+    },
+
+}
+
+//const isClient = $page.props.auth.user.hasRole('client');
 
 </script>
 

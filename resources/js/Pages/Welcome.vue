@@ -10,15 +10,12 @@ defineProps({
     canRegister: {
         type: Boolean,
     },
-    laravelVersion: {
-        type: String,
-        required: true,
-    },
-    phpVersion: {
-        type: String,
+    auth: {
+        type: Object,
         required: true,
     },
 });
+
 
 function handleImageError() {
     document.getElementById('screenshot-container')?.classList.add('!hidden');
@@ -29,15 +26,11 @@ function handleImageError() {
 </script>
 
 <template>
+
     <Head title="Inicio" />
     <div class="flex flex-col min-h-screen bg-gray-50 dark:bg-black text-black dark:text-white">
 
-        <NavBar 
-            :canLogin="$page.props.canLogin" 
-            :canRegister="$page.props.canRegister" 
-            :laravelVersion="$page.props.laravelVersion" 
-            :phpVersion="$page.props.phpVersion"
-        />
+        <NavBar :canLogin="$page.props.canLogin" :canRegister="$page.props.canRegister" :auth="$page.props.auth" />
 
         <!-- HEADER CON SVG (opcional) -->
         <header class="flex justify-center items-center py-10">
