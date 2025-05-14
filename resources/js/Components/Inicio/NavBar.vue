@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import { defineProps, ref } from 'vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
@@ -37,6 +37,10 @@ const localCartCount = ref(0);
 emitter.on('update-cart', (newCount) => {
     localCartCount.value = newCount;
 });
+
+// Obtener el estado de la página
+const search = usePage().props.filters?.search || '';
+
 </script>
 
 <template>
@@ -52,8 +56,16 @@ emitter.on('update-cart', (newCount) => {
 
         <!-- Buscador -->
         <div class="flex-1 mx-8">
-            <input type="text" placeholder="Buscar productos..."
-                class="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-[#FF2D20] focus:ring-[#FF2D20] dark:bg-gray-800 dark:border-gray-700" />
+
+            <form method="GET" :action="route('products.indexHome')" class="flex items-center w-full max-w-md mx-8">
+                <input type="text" name="search" :value="search" placeholder="Buscar productos..."
+                    class="flex-grow rounded-l-md border border-gray-300 px-4 py-2 focus:border-[#FF2D20] focus:ring-[#FF2D20] dark:bg-gray-800 dark:border-gray-700" />
+                <button type="submit"
+                    class="bg-[#fbfcfb] text-black px-4 py-2 rounded-r-md hover:bg-red-600 transition">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+
         </div>
 
         <!-- Carrito + Auth Links -->
@@ -101,12 +113,12 @@ emitter.on('update-cart', (newCount) => {
                 <template v-else>
                     <!-- Si no está logeado -->
                     <Link :href="route('login')" class="text-sm font-medium hover:text-[#FF2D20]">
-                        Iniciar sesión
+                    Iniciar sesión
                     </Link>
 
                     <Link v-if="!canRegister" :href="route('register')"
                         class="text-sm font-medium hover:text-[#FF2D20]">
-                        Registrarse
+                    Registrarse
                     </Link>
                 </template>
             </div>
