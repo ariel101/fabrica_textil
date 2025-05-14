@@ -11,11 +11,21 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-    function indexHome()
+    function indexHome(Request $request)
     {
-        $products = Product::with('images')->get();
+        $query = Product::with('images');
+
+        if ($request->has('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $products = $query->get();
+
         return Inertia::render('Product/Index', [
-            'products' => $products
+            'products' => $products,
+            'filters' => [
+                'search' => $request->search,
+            ],
         ]);
     }
     function index()
