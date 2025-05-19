@@ -1,9 +1,11 @@
 <template>
     <div class="flex h-screen">
-        <!-- <h1>USUARIO = {{ $page.props.auth.user.name }}</h1> -->
+        <!-- <h1>USUARIO = {{ $page.props.auth.user.name }}</h1>
+        <br>
+        <h1>rol = {{ $page.props.auth.user.role }}</h1> -->
 
         <!-- Sidebar -->
-        <Sidebar />
+        <Sidebar v-if="$page.props.auth.user.role === 'admin'"/>
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Navbar -->
             <NavBar />
@@ -35,6 +37,7 @@ export default {
 }
 
 //const isClient = $page.props.auth.user.hasRole('client');
+
 
 </script>
 

@@ -18,7 +18,11 @@ const user = usePage().props.auth.user;
 
 const form = useForm({
     name: user.name,
+    username: user.username,
     email: user.email,
+    cellphone: user.cellphone,
+    identity_card: user.identity_card,
+    city: user.city,
 });
 </script>
 
@@ -38,6 +42,7 @@ const form = useForm({
             @submit.prevent="form.patch(route('profile.update'))"
             class="mt-6 space-y-6"
         >
+            <!-- Nombre -->
             <div>
                 <InputLabel for="name" value="Name" />
 
@@ -54,6 +59,22 @@ const form = useForm({
                 <InputError class="mt-2" :message="form.errors.name" />
             </div>
 
+            <!-- Nombre de usuario -->
+            <div>
+                <InputLabel for="username" value="Username" />
+
+                <TextInput
+                    id="username"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.username"
+                    autocomplete="username"
+                />
+
+                <InputError class="mt-2" :message="form.errors.username" />
+            </div>
+
+            <!-- email -->
             <div>
                 <InputLabel for="email" value="Email" />
 
@@ -69,6 +90,7 @@ const form = useForm({
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
+            <!-- Verificación de email -->
             <div v-if="mustVerifyEmail && user.email_verified_at === null">
                 <p class="mt-2 text-sm text-gray-800">
                     Your email address is unverified.
@@ -88,6 +110,54 @@ const form = useForm({
                 >
                     A new verification link has been sent to your email address.
                 </div>
+            </div>
+
+            <!-- Celular -->
+            <div>
+                <InputLabel for="cellphone" value="Cellphone" />
+
+                <TextInput
+                    id="cellphone"
+                    type="tel"
+                    class="mt-1 block w-full"
+                    v-model="form.cellphone"
+                    autocomplete="tel"
+                />
+
+                <InputError class="mt-2" :message="form.errors.cellphone" />
+            </div>
+
+            <!-- Carnet de identidad-->
+            <div>
+                <InputLabel for="identity_card" value="Identity Card" />
+
+                <TextInput
+                    id="identity_card"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.identity_card"
+                />
+
+                <InputError class="mt-2" :message="form.errors.identity_card" />
+            </div>
+
+            <!-- Ciudad -->
+            <div>
+                <InputLabel for="city" value="Ciudad" />
+                <select id="city" v-model="form.city" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option disabled value="">Seleccione una ciudad</option>
+                    <option>La Paz</option>
+                    <option>El Alto</option>
+                    <option>Cochabamba</option>
+                    <option>Santa Cruz</option>
+                    <option>Sucre</option>
+                    <option>Oruro</option>
+                    <option>Potosi</option>
+                    <option>Tarija</option>
+                    <option>Beni</option>
+                    <option>Pando</option>
+                </select>
+                <InputError class="mt-2" :message="form.errors.city" />
             </div>
 
             <div class="flex items-center gap-4">

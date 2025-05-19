@@ -23,7 +23,11 @@ class UserSeeder extends Seeder
         // Crear el usuario admin
         $admin = User::create([
             'name' => 'Admin User',
+            'username' => 'adminusername',
             'email' => 'admin@example.com',
+            'cellphone' => '0987654321',
+            'identity_card' => '123456789',
+            'city' => 'City Name',
             'password' => bcrypt('adminpassword') // Cambia la contraseña por algo más seguro
         ]);
         $admin->assignRole('admin'); // Asignar el rol 'admin'
@@ -31,6 +35,7 @@ class UserSeeder extends Seeder
         // Crear el usuario client
         $client = User::create([
             'name' => 'Client User',
+            'username' => 'clientusername',
             'email' => 'client@example.com',
             'cellphone' => '1234567890',
             'identity_card' => '987654321',

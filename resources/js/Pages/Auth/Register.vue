@@ -8,6 +8,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 
 const form = useForm({
     name: '',
+    username: '',
     email: '',
     password: '',
     password_confirmation: '',
@@ -42,6 +43,21 @@ const submit = () => {
                     autocomplete="name"
                 />
                 <InputError class="mt-2" :message="form.errors.name" />
+            </div>
+
+            <!-- Username -->
+            <div class="mt-4">
+                <InputLabel for="username" value="Username" />
+
+                <TextInput
+                    id="username"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.username"
+                    required
+                    autocomplete="username"
+                />
+                <InputError class="mt-2" :message="form.errors.username" />
             </div>
 
             <!-- Email -->
@@ -90,14 +106,28 @@ const submit = () => {
             <div class="mt-4">
                 <InputLabel for="city" value="City" />
 
-                <TextInput
+                <select
                     id="city"
-                    type="text"
-                    class="mt-1 block w-full"
+                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     v-model="form.city"
-                />
+                    required
+                >
+                    <option value="">Seleccione una ciudad</option>
+                    <option value="La Paz">La Paz</option>
+                    <option value="El Alto">El Alto</option>
+                    <option value="Cochabamba">Cochabamba</option>
+                    <option value="Santa Cruz">Santa Cruz</option>
+                    <option value="Sucre">Sucre</option>
+                    <option value="Oruro">Oruro</option>
+                    <option value="Potosí">Potosi</option>
+                    <option value="Tarija">Tarija</option>
+                    <option value="Beni">Beni</option>
+                    <option value="Pando">Pando</option>
+                </select>
+
                 <InputError class="mt-2" :message="form.errors.city" />
             </div>
+
 
             <!-- Password -->
             <div class="mt-4">
