@@ -16,7 +16,14 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'regex:/^[\pL\s]+$/u', 'max:255'],
+            'username' => [
+                'required',
+                'string',
+                'alpha_dash',
+                'max:50',
+                Rule::unique('users', 'username')->ignore($this->user()->id),
+            ],
             'email' => [
                 'required',
                 'string',
@@ -25,6 +32,38 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+
+            'cellphone' => [
+                'required',
+                'string',
+                'regex:/^[0-9]{8,20}$/',
+                Rule::unique('users', 'cellphone')->ignore($this->user()->id),
+            ],
+
+            'identity_card' => [
+                'required',
+                'string',
+                'regex:/^[0-9]{7,20}$/',
+                Rule::unique('users', 'identity_card')->ignore($this->user()->id),
+            ],
+
+            'city' => [
+                'required',
+                'string',
+                Rule::in([
+                    'La Paz',
+                    'El Alto',
+                    'Cochabamba',
+                    'Santa Cruz',
+                    'Sucre',
+                    'Oruro',
+                    'Potosi',
+                    'Tarija',
+                    'Beni',
+                    'Pando',
+                ]),
+            ],
+
         ];
     }
 }
