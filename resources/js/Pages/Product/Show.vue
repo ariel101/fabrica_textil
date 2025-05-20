@@ -1,12 +1,11 @@
 <template>
-    <Welcome>
+    <Welcome :showFooter="false" :showCategories="false">
         <section class="p-6 max-w-7xl mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10 bg-white rounded-2xl shadow-lg overflow-hidden">
                 <!-- Imagen del producto -->
                 <div class="flex items-center justify-center bg-gray-100">
                     <button @click="prevImage"
-                        class="absolute left-4 bg-white p-2 rounded-full shadow hover:bg-gray-200"
-                        :disabled="currentImageIndex === 0">
+                        class="absolute left-4 bg-white p-2 rounded-full shadow hover:bg-gray-200">
                         <i class="fas fa-chevron-left"></i>
                     </button>
 
@@ -14,10 +13,10 @@
                         class="object-cover w-full h-72 transition-all duration-300 ease-in-out" />
 
                     <button @click="nextImage"
-                        class="absolute right-4 bg-white p-2 rounded-full shadow hover:bg-gray-200"
-                        :disabled="currentImageIndex === product.images.length - 1">
+                        class="absolute right-4 bg-white p-2 rounded-full shadow hover:bg-gray-200">
                         <i class="fas fa-chevron-right"></i>
                     </button>
+
                 </div>
 
                 <!-- Detalles del producto -->
@@ -35,6 +34,16 @@
                         <i class="fa-solid fa-cart-shopping mr-2"></i> Añadir al carrito
                     </button>
                 </div>
+
+            </div>
+            <!-- Miniaturas -->
+            <div class="mt-4 flex flex-wrap justify-center gap-2 px-4">
+                <img v-for="(img, index) in product.images" :key="index" :src="`/${img.path}`"
+                    @click="currentImageIndex = index"
+                    class="w-16 h-16 object-cover border-2 rounded-md cursor-pointer transition duration-200" :class="{
+                        'border-blue-500': index === currentImageIndex,
+                        'opacity-70 hover:opacity-100': index !== currentImageIndex
+                    }" />
             </div>
         </section>
     </Welcome>
@@ -51,17 +60,28 @@ import emitter from '@/utils/eventBus.js'
 const cartCount = ref(0) // Estado local del carrito
 const currentImageIndex = ref(0)
 
+// const nextImage = () => {
+//     if (currentImageIndex.value < product.images.length - 1) {
+//         currentImageIndex.value++
+//     }
+// }
+
+// const prevImage = () => {
+//     if (currentImageIndex.value > 0) {
+//         currentImageIndex.value--
+//     }
+// }
+
 const nextImage = () => {
-    if (currentImageIndex.value < product.images.length - 1) {
-        currentImageIndex.value++
-    }
+    if (product.images.length === 0) return
+    currentImageIndex.value = (currentImageIndex.value + 1) % product.images.length
 }
 
 const prevImage = () => {
-    if (currentImageIndex.value > 0) {
-        currentImageIndex.value--
-    }
+    if (product.images.length === 0) return
+    currentImageIndex.value = (currentImageIndex.value - 1 + product.images.length) % product.images.length
 }
+
 const { product } = usePage().props
 
 const addToCart = async (productId) => {

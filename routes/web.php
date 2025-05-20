@@ -34,8 +34,9 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/', [ProductController::class, 'indexHome'])->name('products.indexHome');
+//Route::get('/', [CategoryController::class, 'filtrarPorCategoria'])->name('products.index');
 Route::get('product/{id}', [ProductController::class, 'showHome'])->name('products.showHome');
-//Route::get('/', [ImageController::class, 'index'])->name('images.index');
+Route::get('/category/{id?}', [CategoryController::class, 'filtrarPorCategoria'])->name('products.filtrarPorCategoria');
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');

@@ -11,20 +11,47 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-    function indexHome(Request $request)
+    // function indexHome(Request $request)
+    // {
+    //     $query = Product::with('images');
+
+    //     if ($request->has('search')) {
+    //         $query->where('name', 'like', '%' . $request->search . '%');
+    //     }
+
+    //     $products = $query->get();
+
+    //     return Inertia::render('Product/Index', [
+    //         'products' => $products,
+    //         'filters' => [
+    //             'search' => $request->search,
+    //         ],
+    //     ]);
+    // }
+
+    public function indexHome(Request $request)
     {
         $query = Product::with('images');
 
+        // Filtrar por búsqueda
         if ($request->has('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
+        // Filtrar por categoría
+        if ($request->has('category_id') && $request->category_id) {
+            $query->where('category_id', $request->category_id);
+        }
+
         $products = $query->get();
+        $categories = Category::all();
 
         return Inertia::render('Product/Index', [
             'products' => $products,
+            'categories' => $categories,
             'filters' => [
                 'search' => $request->search,
+                'selectedCategory' => $request->category_id,
             ],
         ]);
     }
@@ -247,7 +274,7 @@ class ProductController extends Controller
     {
         $products = Product::where('category_id', $categoryId)->get();
 
-        return Inertia::render('Product/CategoryProducts', [
+        return Inertia::render('Inicio/NavBarCategories', [
             'products' => $products,
             'categoryId' => $categoryId,
         ]);

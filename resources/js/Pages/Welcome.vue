@@ -2,6 +2,7 @@
 import { Head, Link } from '@inertiajs/vue3';
 import NavBar from '@/Components/Inicio/NavBar.vue';
 import Footer from '@/Components/Inicio/Footer.vue';
+import NavBarCategories from '@/Components/Inicio/NavBarCategories.vue';
 
 defineProps({
     canLogin: {
@@ -14,6 +15,15 @@ defineProps({
         type: Object,
         required: true,
     },
+    showFooter: {
+        type: Boolean,
+        default: true,
+    },
+    showCategories: {
+        type: Boolean,
+        default: true,
+    },
+
 });
 
 
@@ -31,6 +41,7 @@ function handleImageError() {
     <div class="flex flex-col min-h-screen bg-gray-50 dark:bg-black text-black dark:text-white">
 
         <NavBar :canLogin="$page.props.canLogin" :canRegister="$page.props.canRegister" :auth="$page.props.auth" />
+        <NavBarCategories v-if="showCategories" />
 
         <!-- HEADER CON SVG (opcional) -->
         <header class="flex justify-center items-center py-10">
@@ -46,6 +57,6 @@ function handleImageError() {
         </main>
 
         <!-- FOOTER -->
-        <Footer />
+        <Footer v-if="showFooter" />
     </div>
 </template>
