@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Category;
+use App\Models\Product;
 
 class CategoryController extends Controller
 {
@@ -51,5 +52,21 @@ class CategoryController extends Controller
     {
         $category->delete();
         return redirect()->route('categories.index')->with('success', 'Categoría eliminada');
+    }
+
+
+    public function filtrarPorCategoria($categoriaId = null)
+    {
+        $categorias = Category::all();
+
+        $productos = $categoriaId
+            ? Product::where('category_id', $categoriaId)->with('images')->get()
+            : Product::with('images')->get();
+
+        return Inertia::render('Product/Index', [
+            'categories' => $categorias,
+            'products' => $productos,
+            'selectedCategory' => $categoriaId,
+        ]);
     }
 }

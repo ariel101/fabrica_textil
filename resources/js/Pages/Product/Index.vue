@@ -1,5 +1,11 @@
 <template>
     <Welcome>
+        <!-- <NavBarCategories @categoriaSeleccionada="filtrarPorCategoria" /> -->
+         <NavBarCategories
+            :categorias="categories"
+            :selectedCategory="selectedCategory"
+            @categoriaSeleccionada="filtrarPorCategoria"
+        />
         <section class="p-6 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <!-- <div v-if="products.length === 0" class="col-span-full text-center text-gray-500 text-lg mt-10">
                 No se encontraron productos para "{{ filters?.search }}"
@@ -35,11 +41,28 @@
 import { usePage } from '@inertiajs/vue3'
 import Welcome from '@/Pages/Welcome.vue'
 import '@fortawesome/fontawesome-free/css/all.min.css'
+import NavBarCategories from '@/Components/Inicio/NavBarCategories.vue';
+import { router } from '@inertiajs/vue3';
+
 //const { products } = usePage().props
 
 defineProps({
     products: Array,
     filters: Object,
+    selectedCategory: [Number, null],
+    categories: Array,
 });
+
+const filtrarPorCategoria = (id) => {
+    if (id === null) {
+        
+        //router.get('/category')
+        router.get(route('products.indexHome')); // Muestra todos los productos
+        //router.get('products.indexHome'); // Muestra todos los productos
+    } else {
+        //router.get(route('products.filtrarPorCategoria', id)); // Filtra por categoría específica
+        router.get('/category/' + id);
+    }
+};
 
 </script>
