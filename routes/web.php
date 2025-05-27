@@ -39,6 +39,6 @@ Route::get('product/{id}', [ProductController::class, 'showHome'])->name('produc
 Route::get('/category/{id?}', [CategoryController::class, 'filtrarPorCategoria'])->name('products.filtrarPorCategoria');
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
+//Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
 
 require __DIR__ . '/auth.php';
