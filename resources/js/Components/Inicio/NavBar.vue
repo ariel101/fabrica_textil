@@ -4,6 +4,7 @@ import { defineProps, ref } from 'vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import emitter from '@/utils/eventBus';
+import { onMounted } from 'vue';
 
 // Props
 defineProps({
@@ -33,10 +34,22 @@ defineProps({
 // Estado local del carrito
 const localCartCount = ref(0);
 
-// Escuchar el evento `update-cart` y actualizar el contador
-emitter.on('update-cart', (newCount) => {
-    localCartCount.value = newCount;
+
+onMounted(() => {
+    const storedCart = localStorage.getItem('cart');
+    if (storedCart) {
+        const items = JSON.parse(storedCart);
+        localCartCount.value = items.reduce((sum, item) => sum + item.quantity, 0);
+    } else {
+        localCartCount.value = 0;
+    }
+
+    // Escuchar eventos del carrito en tiempo real
+    emitter.on('update-cart', (newCount) => {
+        localCartCount.value = newCount;
+    });
 });
+
 
 // Obtener el estado de la página
 const search = usePage().props.filters?.search || '';
@@ -73,16 +86,19 @@ const search = usePage().props.filters?.search || '';
         <!-- Carrito + Auth Links -->
         <div class="flex items-center space-x-4">
             <!-- Carrito -->
-            <a class="relative" :href="route('cart.index')">
-                <svg class="w-6 h-6 text-black dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a class="relative group transition duration-200" :href="route('cart.index')">
+                <svg class="w-6 h-6 text-black dark:text-white group-hover:text-blue-600 group-hover:scale-110 transition-transform duration-200"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h13.4M7 13L5.4 5M16 21a1 1 0 11-2 0 1 1 0 012 0zm-8 0a1 1 0 11-2 0 1 1 0 012 0z" />
                 </svg>
-                <span v-if="localCartCount || cartCount"
-                    class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+
+                <span
+                    class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs group-hover:bg-red-700 transition duration-200">
                     {{ localCartCount || cartCount }}
                 </span>
             </a>
+
 
             <!-- Auth Links -->
             <div v-if="!canLogin" class="flex items-center space-x-2">
