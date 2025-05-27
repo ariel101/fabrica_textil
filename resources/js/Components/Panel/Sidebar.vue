@@ -15,7 +15,7 @@
                 <i class="fas fa-home mr-2"></i>Dashboard
             </InertiaLink>
 
-            <InertiaLink href="#" :class="linkClass('/clientes')">
+            <InertiaLink :href="route('clients.index')" :class="linkClass('/clients')">
                 <i class="fas fa-users mr-2"></i>Clientes
             </InertiaLink>
 
