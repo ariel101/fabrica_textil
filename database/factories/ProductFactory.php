@@ -33,6 +33,7 @@ class ProductFactory extends Factory
             //     ? 'storage/images/' . $this->faker->randomElement($filenames) 
             //     : null, // Seleccionar una imagen aleatoria o dejar null si no hay imágenes
             'category_id' => Category::inRandomOrder()->first()->id // Seleccionar un ID aleatorio de categorías
+            //'category_id' => Category::factory(),
         ];
         
     }
