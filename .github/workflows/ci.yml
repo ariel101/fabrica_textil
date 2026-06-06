@@ -28,8 +28,7 @@ jobs:
           role-session-name: github-actions
 
       - name: Verify OIDC Authentication
-        run: |
-          aws sts get-caller-identity
+        run: aws sts get-caller-identity
 
       - name: Create SSH Key
         run: |
@@ -39,15 +38,12 @@ jobs:
       - name: Add EC2 Host Key
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ vars.EC2_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy Application
         run: |
-          ssh -i key.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -i key.pem ubuntu@${{ vars.EC2_HOST }} << 'EOF'
             cd /var/www/fabrica_textil
 
             git pull origin main
-
-            docker compose down
-            docker compose up -d --build
           EOF
