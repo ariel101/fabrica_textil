@@ -90,8 +90,10 @@ class ProductController extends Controller
                 foreach ($request->images as $image) {
                     if ($image instanceof \Illuminate\Http\UploadedFile) {
                         $path = $image->store('images', 's3');
+                        dd($path);
                         // 2. Obtenemos la URL pública completa de la imagen en S3
                         $s3Url = Storage::disk('s3')->url($path);
+                        dd($s3Url);
                         $product->images()->create([
                             'path' => $s3Url,
                         ]);
@@ -163,7 +165,7 @@ class ProductController extends Controller
 
                     $relativePath = str_replace('storage/', '', $existingImage->path);
                     // Borrar del disco
-                    Storage::disk('public')->delete($relativePath);
+                    Storage::disk('s3')->delete($relativePath);
 
                     // Borrar de la base de datos
                     $existingImage->delete();
@@ -180,7 +182,7 @@ class ProductController extends Controller
                     $imageData = str_replace(' ', '+', $imageData);
                     $path = 'images/' . $imageName;
 
-                    Storage::disk('public')->put($path, base64_decode($imageData));
+                    Storage::disk('s3')->put($path, base64_decode($imageData));
 
                     $product->images()->create([
                         'path' => 'storage/' . $path,

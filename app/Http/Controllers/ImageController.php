@@ -27,11 +27,12 @@ class ImageController extends Controller
         ]);
 
         // Guardar la imagen en el disco
-        $imagePath = $request->file('path')->store('images', 'public');
-
+        $imagePath = $request->file('path')->store('images', 's3');
+        dd($imagePath);
+        $imageUrl = Storage::disk('s3')->url($imagePath);
         // Crear la imagen en la base de datos
         Image::create([
-            'path' => 'storage/' . $imagePath,
+            'path' => $imageUrl,
             'product_id' => $request->input('product_id'), // Asociar con el producto seleccionado
         ]);
 
