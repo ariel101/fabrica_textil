@@ -11,24 +11,7 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-    // function indexHome(Request $request)
-    // {
-    //     $query = Product::with('images');
-
-    //     if ($request->has('search')) {
-    //         $query->where('name', 'like', '%' . $request->search . '%');
-    //     }
-
-    //     $products = $query->get();
-
-    //     return Inertia::render('Product/Index', [
-    //         'products' => $products,
-    //         'filters' => [
-    //             'search' => $request->search,
-    //         ],
-    //     ]);
-    // }
-
+   
     public function indexHome(Request $request)
     {
         $query = Product::with('images');
@@ -106,11 +89,13 @@ class ProductController extends Controller
             if ($request->images && is_array($request->images)) {
                 foreach ($request->images as $image) {
                     if ($image instanceof \Illuminate\Http\UploadedFile) {
-                        $path = $image->store('images', 'public');
+                        $path = $image->store('images', 's3');
+                        // 2. Obtenemos la URL pública completa de la imagen en S3
+                        $s3Url = Storage::disk('s3')->url($path);
                         $product->images()->create([
-                            'path' => 'storage/' . $path,
+                            'path' => $s3Url,
                         ]);
-                        Log::info('Imagen subida: ' . $path);
+                        Log::info('Imagen subida a s3: ' . $s3Url);
                     } else {
                         Log::warning('Elemento en images no es un archivo: ', ['type' => gettype($image)]);
                     }
