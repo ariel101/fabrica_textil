@@ -9,7 +9,7 @@
                         <i class="fas fa-chevron-left"></i>
                     </button>
 
-                    <img :src="`/${product.images[currentImageIndex]?.path}`" alt="Imagen del producto"
+                    <img :src="product.images[currentImageIndex]?.url" alt="Imagen del producto"
                         class="object-cover w-full h-72 transition-all duration-300 ease-in-out" />
 
                     <button @click="nextImage"
@@ -50,7 +50,7 @@
             </div>
             <!-- Miniaturas -->
             <div class="mt-4 flex flex-wrap justify-center gap-2 px-4">
-                <img v-for="(img, index) in product.images" :key="index" :src="`/${img.path}`"
+                <img v-for="(img, index) in product.images" :key="index" :src="img.url"
                     @click="currentImageIndex = index"
                     class="w-16 h-16 object-cover border-2 rounded-md cursor-pointer transition duration-200" :class="{
                         'border-blue-500': index === currentImageIndex,
@@ -114,7 +114,7 @@ const addToCart = (productId) => {
             name: product.name,
             price: parseFloat(product.price),
             quantity: quantity.value,
-            image: product.images[0]?.path || '',
+            image: product.images[0]?.url || '',
         })
     }
 

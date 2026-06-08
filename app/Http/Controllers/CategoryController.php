@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -62,6 +63,12 @@ class CategoryController extends Controller
         $productos = $categoriaId
             ? Product::where('category_id', $categoriaId)->with('images')->get()
             : Product::with('images')->get();
+
+        $productos->each(function ($producto) {
+            $producto->images->each(function ($image) {
+                $image->url = Storage::disk('s3')->url($image->path);
+            });
+        });
 
         return Inertia::render('Product/Index', [
             'categories' => $categorias,

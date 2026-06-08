@@ -5,14 +5,23 @@ namespace App\Http\Controllers;
 use App\Models\Image;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class ImageController extends Controller
 {
     //
-    public function index(){
-        $index = Image::all();
+    use Illuminate\Support\Facades\Storage;
+
+    public function index()
+    {
+        $images = Image::all();
+
+        $images->each(function ($image) {
+            $image->url = Storage::disk('s3')->url($image->path);
+        });
+
         return Inertia::render('Images/Index', [
-            'images' => $index,
+            'images' => $images,
         ]);
     }
 
@@ -28,20 +37,31 @@ class ImageController extends Controller
 
         // Guardar la imagen en el disco
         $imagePath = $request->file('path')->store('images', 's3');
-        dd($imagePath);
+        //dd($imagePath);
         $imageUrl = Storage::disk('s3')->url($imagePath);
         // Crear la imagen en la base de datos
         Image::create([
-            'path' => $imageUrl,
+            'path' => $imagePath,
             'product_id' => $request->input('product_id'), // Asociar con el producto seleccionado
         ]);
 
         return redirect()->back()->with('success', 'Imagen creada exitosamente.');
     }
-    public function destroy($id){
+    public function destroy($id)
+    {
         $image = Image::findOrFail($id);
+
+        // Eliminar archivo de S3
+        if ($image->path) {
+            Storage::disk('s3')->delete($image->path);
+        }
+
+        // Eliminar registro
         $image->delete();
-        return redirect()->back()->with('success', 'Imagen eliminada exitosamente.');
+
+        return redirect()
+            ->back()
+            ->with('success', 'Imagen eliminada exitosamente.');
     }
     public function show($id){
         $image = Image::findOrFail($id);
@@ -55,23 +75,31 @@ class ImageController extends Controller
             'image' => $image,
         ]);
     }
-    public function update(Request $request, $id){
-        // Validar los datos
+    public function update(Request $request, $id)
+    {
         $request->validate([
             'path' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'product_id' => 'required|exists:products,id', // Validar que el producto exista
+            'product_id' => 'required|exists:products,id',
         ]);
 
-        // Guardar la imagen en el disco
-        $imagePath = $request->file('path')->store('images', 'public');
-
-        // Actualizar la imagen en la base de datos
         $image = Image::findOrFail($id);
+
+        // Eliminar imagen anterior de S3
+        if ($image->path && Storage::disk('s3')->exists($image->path)) {
+            Storage::disk('s3')->delete($image->path);
+        }
+
+        // Subir nueva imagen
+        $imagePath = $request->file('path')->store('images', 's3');
+
+        // Actualizar registro
         $image->update([
-            'path' => 'storage/' . $imagePath,
-            'product_id' => $request->input('product_id'), // Asociar con el producto seleccionado
+            'path' => $imagePath,
+            'product_id' => $request->input('product_id'),
         ]);
 
-        return redirect()->back()->with('success', 'Imagen actualizada exitosamente.');
+        return redirect()
+            ->back()
+            ->with('success', 'Imagen actualizada exitosamente.');
     }
 }

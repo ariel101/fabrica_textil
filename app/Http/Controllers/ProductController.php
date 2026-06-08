@@ -17,16 +17,24 @@ class ProductController extends Controller
         $query = Product::with('images');
 
         // Filtrar por búsqueda
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
         // Filtrar por categoría
-        if ($request->has('category_id') && $request->category_id) {
+        if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
         $products = $query->get();
+
+        // Generar URL pública de S3 para cada imagen
+        $products->each(function ($product) {
+            $product->images->each(function ($image) {
+                $image->url = Storage::disk('s3')->url($image->path);
+            });
+        });
+
         $categories = Category::all();
 
         return Inertia::render('Product/Index', [
@@ -90,12 +98,12 @@ class ProductController extends Controller
                 foreach ($request->images as $image) {
                     if ($image instanceof \Illuminate\Http\UploadedFile) {
                         $path = $image->store('images', 's3');
-                        dd($path);
+                        //dd($path);
                         // 2. Obtenemos la URL pública completa de la imagen en S3
                         $s3Url = Storage::disk('s3')->url($path);
-                        dd($s3Url);
+                        //dd($s3Url);
                         $product->images()->create([
-                            'path' => $s3Url,
+                            'path' => $path,
                         ]);
                         Log::info('Imagen subida a s3: ' . $s3Url);
                     } else {
@@ -133,13 +141,11 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-        //dd($request->all());
-        // Validar que el producto existe
         try {
+
             Log::info('Inicio de actualización de producto ID: ' . $product->id);
             Log::info('Datos recibidos:', $request->all());
 
-            // Validar
             $data = $request->validate([
                 'name' => 'required|string',
                 'description' => 'required|string',
@@ -152,47 +158,56 @@ class ProductController extends Controller
                 'images.*.data' => 'nullable|string',
             ]);
 
-            // Paso 1: Extraer solo los paths de imágenes que se quieren conservar
-            $pathsToKeep = collect($request->images)
+            // Imágenes existentes que se conservarán
+            $pathsToKeep = collect($request->images ?? [])
                 ->filter(fn($img) => isset($img['path']))
                 ->pluck('path')
-                //->map(fn($p) => str_replace('storage/', '', $p)) // adaptamos para comparación
                 ->toArray();
 
-            // Paso 2: Eliminar solo imágenes que ya no están en la lista enviada
+            // Eliminar imágenes borradas por el usuario
             foreach ($product->images as $existingImage) {
+
                 if (!in_array($existingImage->path, $pathsToKeep)) {
 
-                    $relativePath = str_replace('storage/', '', $existingImage->path);
-                    // Borrar del disco
-                    Storage::disk('s3')->delete($relativePath);
+                    Storage::disk('s3')->delete($existingImage->path);
 
-                    // Borrar de la base de datos
                     $existingImage->delete();
 
                     Log::info('Imagen eliminada: ' . $existingImage->path);
                 }
             }
 
-            // Paso 3: Guardar las imágenes nuevas (base64)
-            foreach ($request->images as $img) {
-                if (isset($img['data']) && isset($img['name'])) {
-                    $imageName = time() . '_' . $img['name'];
-                    $imageData = preg_replace('#^data:image/\w+;base64,#i', '', $img['data']);
+            // Guardar nuevas imágenes
+            foreach ($request->images ?? [] as $img) {
+
+                if (!empty($img['data']) && !empty($img['name'])) {
+
+                    $imageName = time() . '_' . uniqid() . '_' . $img['name'];
+
+                    $imageData = preg_replace(
+                        '#^data:image/\w+;base64,#i',
+                        '',
+                        $img['data']
+                    );
+
                     $imageData = str_replace(' ', '+', $imageData);
+
                     $path = 'images/' . $imageName;
 
-                    Storage::disk('s3')->put($path, base64_decode($imageData));
+                    Storage::disk('s3')->put(
+                        $path,
+                        base64_decode($imageData)
+                    );
 
                     $product->images()->create([
-                        'path' => 'storage/' . $path,
+                        'path' => $path,
                     ]);
 
                     Log::info('Imagen nueva guardada: ' . $path);
                 }
             }
 
-            // Paso 4: Actualizar el producto
+            // Actualizar producto
             $product->update([
                 'name' => $data['name'],
                 'description' => $data['description'],
@@ -202,18 +217,22 @@ class ProductController extends Controller
             ]);
 
             Log::info('Producto actualizado correctamente');
-            return redirect()->route('products.index')->with('success', 'Producto actualizado');
+
+            return redirect()
+                ->route('products.index')
+                ->with('success', 'Producto actualizado correctamente');
+
         } catch (\Exception $e) {
+
             Log::error('Error en ProductController@update: ' . $e->getMessage(), [
                 'line' => $e->getLine(),
                 'file' => $e->getFile(),
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return response()->json([
-                'error' => 'Error al actualizar el producto',
-                'mensaje' => $e->getMessage(),
-            ], 500);
+            return back()->withErrors([
+                'error' => $e->getMessage()
+            ]);
         }
     }
 
@@ -221,27 +240,43 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         try {
-            // Eliminar imágenes asociadas del disco y la base de datos
+
             foreach ($product->images as $image) {
-                Storage::disk('public')->delete(str_replace('storage/', '', $image->path));
+
+                Storage::disk('s3')->delete($image->path);
+
                 $image->delete();
+
+                Log::info('Imagen eliminada: ' . $image->path);
             }
 
-            // Eliminar el producto
             $product->delete();
 
-            return redirect()->back()->with('success', 'Producto e imágenes eliminados exitosamente.');
-        } catch (\Exception $e) {
-            Log::error('Error al eliminar producto: ' . $e->getMessage());
+            return redirect()
+                ->back()
+                ->with('success', 'Producto e imágenes eliminados exitosamente.');
 
-            return redirect()->back()->with('error', 'Hubo un error al eliminar el producto.');
+        } catch (\Exception $e) {
+
+            Log::error('Error al eliminar producto: ' . $e->getMessage(), [
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'Hubo un error al eliminar el producto.');
         }
     }
-
 
     public function showHome($id)
     {
         $product = Product::with('images')->findOrFail($id);
+
+        $product->images->each(function ($image) {
+            $image->url = Storage::disk('s3')->url($image->path);
+        });
 
         return Inertia::render('Product/Show', [
             'product' => $product,
