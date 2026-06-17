@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 class ImageController extends Controller
 {
     //
-    use Illuminate\Support\Facades\Storage;
+    //use Illuminate\Support\Facades\Storage;
 
     public function index()
     {
