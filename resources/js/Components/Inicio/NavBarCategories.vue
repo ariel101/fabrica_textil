@@ -7,7 +7,7 @@
                     class="hover:bg-gray-600 px-4 py-2 rounded-md text-sm font-medium transition"
                     :class="{ 'bg-gray-600': selectedCategory === null }"
                 >
-                    Todos
+                    Todoss
                 </button>
             </li>
             <li v-for="categoria in categorias" :key="categoria.id">
