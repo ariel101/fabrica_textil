@@ -52,16 +52,16 @@ jobs:
           echo "Comando SSM enviado con ID: $COMMAND_ID"
           echo "Esperando a que termine la ejecución en el clúster..."
           
-          # Ciclo inteligente para esperar el resultado sin pedir Instance ID
-          while [ "$(aws ssm get-command --command-id "$COMMAND_ID" --query "Command.Status" --output text)" = "Pending" ] || \
-                [ "$(aws ssm get-command --command-id "$COMMAND_ID" --query "Command.Status" --output text)" = "InProgress" ]; do
+          # Ciclo corregido usando list-commands con filtro de ID
+          while [ "$(aws ssm list-commands --command-id "$COMMAND_ID" --query "Commands[0].Status" --output text)" = "Pending" ] || \
+                [ "$(aws ssm list-commands --command-id "$COMMAND_ID" --query "Commands[0].Status" --output text)" = "InProgress" ]; do
             sleep 5
           done
           
-          STATUS=$(aws ssm get-command --command-id "$COMMAND_ID" --query "Command.Status" --output text)
+          STATUS=$(aws ssm list-commands --command-id "$COMMAND_ID" --query "Commands[0].Status" --output text)
           echo "Despliegue finalizado con estado: $STATUS"
           
           if [ "$STATUS" != "Success" ]; then
-            echo "El despliegue falló en AWS Systems Manager"
+            echo "El despliegue falló en AWS Systems Manager. Revisa la consola de AWS para ver los logs."
             exit 1
           fi
