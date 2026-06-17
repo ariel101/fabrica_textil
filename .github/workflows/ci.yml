@@ -1,4 +1,4 @@
-name: Deploy EC2
+name: Deploy to EC2 via AWS SSM
 
 on:
   push:
@@ -20,30 +20,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configure AWS Credentials (OIDC)
+      # 1. Autenticación con AWS vía OIDC
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           role-session-name: github-actions
 
-      - name: Verify OIDC Authentication
-        run: aws sts get-caller-identity
-
-      - name: Create SSH Key
+      # 2. Enviar el comando de despliegue a través de SSM Run Command
+      - name: Execute Remote Commands via SSM
         run: |
-          echo "${{ secrets.EC2_PRIVATE_KEY }}" > key.pem
-          chmod 600 key.pem
-
-      - name: Add EC2 Host Key
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Deploy Application
-        run: |
-          ssh -i key.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
-            cd /var/www/fabrica_textil
-
-            git pull origin main
-          EOF
+          COMMAND_ID=$(aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:App,Values=fabrica_textil" \
+            --comment "Despliegue automático desde GitHub Actions" \
+            --parameters 'commands=[
+              "cd /var/www/fabrica_textil",
+              "sudo git fetch origin main",
+              "sudo git reset --hard origin/main",
+              "echo \"Despliegue completado con éxito\""
+            ]' \
+            --query "Command.CommandId" \
+            --output text)
+          
+          echo "Comando SSM enviado con ID: $COMMAND_ID"
+          
+          # Opcional: Esperar a que el comando termine para ver si falló o no en GitHub
+          echo "Esperando a que termine la ejecución..."
+          aws ssm wait command-executed --command-id "$COMMAND_ID"
