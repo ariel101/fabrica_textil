@@ -34,18 +34,34 @@ jobs:
           COMMAND_ID=$(aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=tag:App,Values=fabrica_textil" \
-            --comment "Despliegue automático desde GitHub Actions" \
+            --comment "Despliegue Laravel + Vue desde GitHub Actions" \
             --parameters 'commands=[
               "cd /var/www/fabrica_textil",
-              "sudo git fetch origin main",
-              "sudo git reset --hard origin/main",
-              "echo \"Despliegue completado con éxito\""
+              "sudo -u ubuntu git fetch origin main",
+              "sudo -u ubuntu git reset --hard origin/main",
+              "sudo -u ubuntu npm run build",
+              "sudo -u ubuntu php artisan optimize:clear",
+              "sudo -u ubuntu php artisan optimize",
+              "sudo chmod -R 775 storage bootstrap/cache",
+              "sudo chown -R ubuntu:www-data storage bootstrap/cache",
+              "sudo systemctl reload \"php*-fpm\""
             ]' \
             --query "Command.CommandId" \
             --output text)
           
           echo "Comando SSM enviado con ID: $COMMAND_ID"
+          echo "Esperando a que termine la ejecución en el clúster..."
           
-          # Opcional: Esperar a que el comando termine para ver si falló o no en GitHub
-          echo "Esperando a que termine la ejecución..."
-          aws ssm wait command-executed --command-id "$COMMAND_ID"
+          # Ciclo inteligente para esperar el resultado sin pedir Instance ID
+          while [ "$(aws ssm get-command --command-id "$COMMAND_ID" --query "Command.Status" --output text)" = "Pending" ] || \
+                [ "$(aws ssm get-command --command-id "$COMMAND_ID" --query "Command.Status" --output text)" = "InProgress" ]; do
+            sleep 5
+          done
+          
+          STATUS=$(aws ssm get-command --command-id "$COMMAND_ID" --query "Command.Status" --output text)
+          echo "Despliegue finalizado con estado: $STATUS"
+          
+          if [ "$STATUS" != "Success" ]; then
+            echo "El despliegue falló en AWS Systems Manager"
+            exit 1
+          fi
